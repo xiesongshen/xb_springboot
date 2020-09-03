@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/xb_springboot
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true    # 格式化sql
+        show_sql: true        # 显示sql
+mybatis:
+  mapper-locations: classpath:mybatis/*.xml			# mapper文件路径
+  type-aliases-package: com.xss.entity				# 实体类路径
+  configuration:
+    map-underscore-to-camel-case: true      # 开启驼峰命名
+
+
+file:
+  realPath: D:/uploadImage/      #配置用户上传图片的实际路径
+  path: /uploadImage/**          #配置用户上传图片的虚拟路径

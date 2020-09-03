@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/form-elements.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/layer.css">
+    <title>注册</title>
+    <style>
+        body {
+            background: url("img/bg.jpg") no-repeat fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container myBox" id="app">
+    <div class="col-xs-8 col-xs-offset-4 col-sm-6 col-sm-offset-3 form-box">
+        <div class="form-top">
+            <div class="form-top-left">
+                <h3>新用户注册</h3>
+                <p>请输入您的信息:</p>
+            </div>
+            <div class="form-top-right">
+                <i class="fa fa-key"></i>
+            </div>
+        </div>
+        <div class="form-bottom">
+            <form role="form" action="html/home.html" method="post" class="login-form">
+
+                <!--上面的输入框尽可能不需要外边距，使用row解决-->
+                <div class="row">
+                    <div class="form-group">
+                        <label class="sr-only" for="form-username">Email</label>
+                        <input type="text" @blur="checkEmail($event)" v-model="user.email" name="form-email"
+                               placeholder="邮箱" class="form-username form-control" id="form-email">
+                    </div>
+                    <div class="form-group">
+                        <label class="sr-only" for="form-username">Username</label>
+                        <input type="text" @blur="checkUsername($event)" v-model="user.username" name="form-username"
+                               placeholder="用户名" class="form-username form-control" id="form-username">
+                    </div>
+                    <div class="form-group">
+                        <label class="sr-only" for="form-password">Password</label>
+                        <input type="password" name="form-password" v-model="user.password" placeholder="密码"
+                               class="form-password form-control" id="form-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="sr-only" for="form-password2">Password</label>
+                        <input type="password" @blur="checkPassword($event)" name="form-password2" v-model="cPassword"
+                               placeholder="确认密码" class="form-password form-control" id="form-password2">
+                    </div>
+                </div>
+                <!--上面的输入框尽可能不需要外边距，使用row包裹起来解决-->
+
+                <button type="button" class="btn" @click="doRegister">注册</button>
+
+                <div class="row">
+                    <div style="padding: 10px 25px">
+                        <div style="display: inline-block;float: left" class="text-left"><a href="index.html">返回登录</a>
+                        </div>
+                        <!--<div style="display: inline-block;float: right" class="text-right"><a href="#">没有账号?</a></div>-->
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Javascript -->
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="js/jquery.backstretch.min.js"></script>
+<script src="js/scripts.js"></script>
+<script src="js/layer.js"></script>
+<script src="js/vue-2.6.11.js"></script>
+<script src="js/axios-0.19.2.min.js"></script>
+<script src="js/jquery-cookie-1.4.1.js"></script>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            user: {},
+            cPassword: ""
+        },
+        methods: {
+            checkEmail: function (event) {
+                axios({
+                    url: '/user/checkEmail',
+                    params: {email: this.user.email}
+                }).then(response => {
+                    if (response.data.data != null) {
+                        $(event.target).addClass("input-error");
+                        layer.msg("邮箱已被注册")
+                    } else {
+                        $(event.target).removeClass("input-error");
+                    }
+                })
+            },
+            checkPassword: function (event) {
+                if (this.user.password != this.cPassword || this.cPassword.length == 0) {
+                    layer.msg("两次密码请输入一致");
+                    $(event.target).addClass("input-error");
+                } else {
+                    $(event.target).removeClass("input-error");
+                }
+
+            },
+            checkUsername: function (event) {
+                axios({
+                    url: '/user/checkUsername',
+                    params: {username: this.user.username}
+                }).then(response => {
+                    if (response.data.data != null) {
+                        $(event.target).addClass("input-error");
+                        layer.msg("用户名已被注册")
+                    } else {
+                        $(event.target).removeClass("input-error");
+                    }
+                })
+            },
+            doRegister:function () {
+                let flag = 1;
+                $(".login-form").find('input[class*="input-error"]').each(function () {
+                    flag = 0;
+                    return;
+                });
+
+                if (flag){
+                    axios({
+                        url:'/user/doRegister',
+                        data:this.user,
+                        method:'post'
+                    }).then(response=>{
+                        if (response.data.flag){
+                            location.href="/index.html";
+                        }else {
+                            layer.msg(response.data.message);
+                        }
+                    }).catch(error=>{
+                        layer.msg(error.message);
+                    })
+                }else {
+                    layer.msg("请输入正确信息")
+                }
+            }
+        }
+    })
+</script>

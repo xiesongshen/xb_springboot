@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xss.mapper.ArticleMapper">
+    <select id="selectCollectUser" resultType="com.xss.entity.User">
+		SELECT
+			uf.*
+		FROM
+			( SELECT u.* FROM favorite f, `user` u WHERE u.id = f.u_id AND f.a_id = #{aid} ) u,
+			( SELECT u.* FROM favorite f, `user` u WHERE u.id = f.u_id AND f.a_id = #{aid} ) uf,
+			userfocus ufs
+		WHERE
+			u.id = ufs.user_id
+			AND ufs.user_focus_id = uf.id
+			AND u.id = #{uid}
+	</select>
+</mapper>
+ 
