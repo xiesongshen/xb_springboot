@@ -159,4 +159,14 @@ public class UserService {
     public List<User> findByDeptId(Long deptId) {
         return userDao.findByDeptId(deptId);
     }
+
+
+    /*
+     * @param
+     * @return com.xss.entity.User
+     * @desc  根据wc_openId判断用户是否用微信登陆过
+     */
+    public User findByWxOpenid(String openid) {
+        return userDao.findByWxOpenid(openid);
+    }
 }

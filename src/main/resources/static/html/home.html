@@ -45,7 +45,7 @@
                 <div class="right-menu list-inline no-margin-bottom">
                     <!-- Log out -->
                     <div class="list-inline-item logout">
-                        <a id="logout" href="../index.html" class="nav-link"><span
+                        <a id="logout" href="javascript" @click="loginOut" class="nav-link"><span
                                 class="d-none d-sm-inline">Logout </span></a>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
                                     <div class="title">
                                         <strong>新增用户</strong>
                                     </div>
-                                    <div class="number dashtext-1">27</div>
+                                    <div class="number dashtext-1">{{countData.userCount}}</div>
                                 </div>
                                 <div class="progress progress-template">
                                     <!--这个百分比由前端计算,取接近100%的数,例如 140就是接近200于是为40%-->
@@ -120,7 +120,7 @@
                                     <div class="title">
                                         <strong>新增文章</strong>
                                     </div>
-                                    <div class="number dashtext-3">140</div>
+                                    <div class="number dashtext-1">{{countData.articleCount}}</div>
                                 </div>
                                 <div class="progress progress-template">
                                     <!--这个百分比由前端计算,取接近100%的数,例如 140就是接近200于是为40%-->
@@ -135,7 +135,7 @@
                                     <div class="title">
                                         <strong>新开会议</strong>
                                     </div>
-                                    <div class="number dashtext-6">8</div>
+                                    <div class="number dashtext-1">{{countData.meetingCount}}</div>
                                 </div>
                                 <div class="progress progress-template">
                                     <!--这个百分比由前端计算,取接近100%的数,例如 140就是接近200于是为40%-->
@@ -192,26 +192,89 @@
         el: '#app',
         data: {
             uid: sessionStorage.getItem("userId"),
-            loginUser: JSON.parse(localStorage.getItem("loginUser"))
+            loginUser: JSON.parse(localStorage.getItem("loginUser")),
+            countData: {},
+            detailData: []
         },
         methods: {
             toUpdate: function () {
                 sessionStorage.setItem("userId", this.loginUser.id);
                 location.href = '/html/user_look.html';
-            }
+            },
+            loginOut:function () {
+
+                axios({
+                    url:'/user/loginOut'
+                }).then(response=>{
+
+                    if (response.data.flag){
+
+                        // 清除localStorage的数据
+                        localStorage.removeItem("userId");
+
+                        // 清空cookie
+                        $.removeCookie("userId", {path: "/"})
+
+                        // 跳转到首页
+                        location.href = '/index.html';
+                    }
+                }).catch(error=>{
+                    layer.msg(error.message);
+                })
+            },
+            home() {
+                axios.get("/home").then((res) => {
+                    if (res.data.flag) {
+                        this.countData = res.data.data.countData;
+                        this.detailData = res.data.data.detailData;
+
+                    }
+                }).finally(() => {
+
+                    let option = myChart.getOption();
+
+                    // 新增用户
+                    option.series[0].data=this.detailData[0];
+
+                    // 新增文章
+                    option.series[1].data=this.detailData[1];
+
+                    // 新开会议
+                    option.series[2].data=this.detailData[2];
+                    myChart.setOption(option);
+                });
+            },
         },
         created: function () {
-
+            this.home();
         }
     });
 
-    $(function () {
-        var needRefresh = sessionStorage.getItem("need-refresh");
-        if (needRefresh) {
-            sessionStorage.removeItem("need-refresh");
-            location.reload();
+    var date = new Date();
+
+    // 存放计算的天数
+    var days = [];
+
+    // 计算近7天的日期
+    for (var i = -6; i <= 0; i++) {
+
+        date.setDate(date.getDate() + i);
+
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+        if (month < 10) {
+            month = "0" + month;
         }
-    })
+
+        if (day < 10) {
+            day = "0" + day;
+        }
+        days.push(month + "." + day);
+
+        // date回归原位
+        date.setDate(date.getDate() - i)
+    }
+
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'));
 
@@ -237,7 +300,10 @@
         // 工具栏(图片另存为按钮)
         toolbox: {
             feature: {
-                saveAsImage: {}
+                saveAsImage: {},
+                magicType: {
+                    type: ['line', 'bar', 'stack', 'tiled']
+                },
             }
         },
         // 布局
@@ -250,7 +316,7 @@
         xAxis: [{
             type: 'category',
             boundaryGap: false,
-            data: ["10.21", "10.22", "10.23", "10.24", "10.25", "10.26", "10.27", "10.28", "10.29"]
+            data: days
         }],
         yAxis: [{
             type: 'value'

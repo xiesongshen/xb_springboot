@@ -81,16 +81,22 @@ public class LoginUserUtil {
          */
         Cookie cookie = getCookie("userId");
 
-        // 先从redis获取
-        User user = (User) redisTemplate.opsForValue().get("loginUser:" + cookie.getValue());
+        if (cookie != null) {
 
-        if (user == null) {
-            // redis过期了就从redis查询
-            user = userService.findById(Long.parseLong(cookie.getValue()));
+            // 先从redis获取
+            User user = (User) redisTemplate.opsForValue().get("loginUser:" + cookie.getValue());
 
-            redisTemplate.opsForValue().set("loginUser:" + cookie.getValue(), user, 7, TimeUnit.DAYS);
+            if (user == null) {
+                // redis过期了就从redis查询
+                user = userService.findById(Long.parseLong(cookie.getValue()));
+
+                redisTemplate.opsForValue().set("loginUser:" + cookie.getValue(), user, 7, TimeUnit.DAYS);
+            }
+
+            return user;
         }
-        return user;
+
+        return null;
     }
 
 

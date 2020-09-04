@@ -9,6 +9,9 @@ spring:
       hibernate:
         format_sql: true    # 格式化sql
         show_sql: true        # 显示sql
+  profiles:
+    active: login      # 激活application-login.yml
+
 mybatis:
   mapper-locations: classpath:mybatis/*.xml			# mapper文件路径
   type-aliases-package: com.xss.entity				# 实体类路径

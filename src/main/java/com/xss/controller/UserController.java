@@ -84,6 +84,13 @@ public class UserController {
     public Result doReset(String email, String password) {
         userService.updatePassword(email, password);
 
+        if (LoginUserUtil.getLoginUser()!=null){
+
+            redisTemplate.delete("loginUser:"+LoginUserUtil.getLoginUser().getId());
+
+            session.invalidate();
+        }
+
         return new Result(true, "修改成功");
     }
 
@@ -95,6 +102,10 @@ public class UserController {
     @PostMapping("login/{checkCode}")
     public Result login(@RequestBody User user, @PathVariable String checkCode) {
         String safeCode = session.getAttribute("safeCode").toString();
+
+        if (user.getUsername() == null || user.getPassword() == null){
+            return new Result(false,"请输入用户名或密码");
+        }
 
         if (!safeCode.equals(checkCode) || checkCode == null) {
             return new Result(false, "请输入正确验证码");
@@ -282,4 +293,18 @@ public class UserController {
         return new Result(true,"成功",userService.findByDeptId(deptId));
     }
 
+    /*
+     * @param
+     * @return
+     * @desc  登出
+     */
+    @RequestMapping("loginOut")
+    public Result loginOut(){
+
+        redisTemplate.delete("loginUser:"+LoginUserUtil.getLoginUser().getId());
+
+        session.invalidate();
+
+        return new Result(true,"登出成功");
+    }
 }

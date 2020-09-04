@@ -23,7 +23,7 @@ var vm = new Vue({
 
             this.meeting.makeUser = this.joinUids.toString();
             this.meeting.startTime = this.meeting.startTime.replace("T"," ");
-            this.meeting.endTime = this.meeting.endTime.replace("T"," ");
+            this.meeting.endTime = this.meeting.endTime.replace("T" ," ");
 
             axios({
                 url:'/meeting/save',

@@ -105,4 +105,11 @@ public interface UserDao extends JpaRepository<User,Long> {
      * @desc 根据部门id查询用户
      */
     List<User> findByDeptId(Long deptId);
+
+    /*
+     * @param
+     * @return com.xss.entity.User
+     * @desc  判断用户是否用微信登陆过
+     */
+    User findByWxOpenid(String openid);
 }

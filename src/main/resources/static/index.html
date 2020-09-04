@@ -63,8 +63,19 @@
                         <input type="checkbox" v-model="remember" true-value="1" false-value="0"> 记住我
                     </label>
                 </div>
-                <button type="button" class="btn" @click="doLogin">登录</button>
 
+                <div class="form-group">
+
+                    <button type="button" class="btn" @click="doLogin">登录</button>
+
+                </div>
+
+                <div class="form-group">
+
+                <button class="btn" @click="wxLogin">微信扫码登录</button>
+
+                </div>
+                
                 <div class="row">
                     <div style="padding: 10px 25px">
                         <div style="display: inline-block;float: left" class="text-left"><a href="forget.html">忘记密码?</a>
@@ -101,6 +112,11 @@
         },
         methods: {
             doLogin: function () {
+                if (this.checkCode == ""){
+                    layer.msg("请输入验证码");
+                    return;
+                }
+
                 axios({
                     url: `/user/login/${this.checkCode}`,
                     data: this.user,
@@ -108,7 +124,7 @@
                 }).then(response => {
                     console.log(response)
                         if (response.data.flag) {
-                            if (this.remember) {
+                            if (this.remember=="1") {
                                 // 7天免密登录(单位:天)
                                 $.cookie("userId", response.data.data.userId, {path: "/", expires: 7});
                             }
@@ -124,6 +140,9 @@
                 ).catch(error => {
                     layer.msg(error.message);
                 })
+            },
+            wxLogin:function () {
+                location.href = "/to_wxLogin";
             }
         }
     })
