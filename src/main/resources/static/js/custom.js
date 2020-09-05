@@ -1,6 +1,12 @@
 /* your js go here */
 $(function () {
 
+    var socket = new WebSocket("ws://localhost:8080/xb_socket/"+JSON.parse(localStorage.getItem("loginUser")).id)
+
+    socket.onmessage = function (event) {
+        layer.msg(event.data);
+    }
+
 
     $("#avatar").click(function () {
         console.log("你点击了头像");

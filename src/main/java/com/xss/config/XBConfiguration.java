@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 /**
  * @author XSS
@@ -81,5 +82,15 @@ public class XBConfiguration extends WebMvcConfigurerAdapter {
                 .excludePathPatterns("/vendor/**")
                 .excludePathPatterns("/assets/**")
                 .excludePathPatterns("/upload/**");
+    }
+
+    /*
+     * @param
+     * @return org.springframework.web.socket.server.standard.ServerEndpointExporter
+     * @desc  开启WebSocket支持
+     */
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter(){
+        return new ServerEndpointExporter();
     }
 }

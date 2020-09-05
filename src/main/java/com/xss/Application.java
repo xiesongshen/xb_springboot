@@ -8,6 +8,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+
 /**
  * @author XSS
  * @date 2020/8/31
@@ -32,4 +33,6 @@ public class Application {
 
         return redisTemplate;
     }
+
+
 }
