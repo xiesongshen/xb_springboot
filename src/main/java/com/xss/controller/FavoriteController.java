@@ -1,7 +1,11 @@
 package com.xss.controller;
 
+import com.xss.config.XbWebSocket;
+import com.xss.entity.Article;
 import com.xss.entity.Result;
+import com.xss.service.ArticleService;
 import com.xss.service.FavoriteService;
+import com.xss.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +21,9 @@ public class FavoriteController {
 
     @Autowired
     FavoriteService favoriteService;
+
+    @Autowired
+    ArticleService articleService;
 
     /*
      * @param
@@ -57,6 +64,11 @@ public class FavoriteController {
 
         //未收藏,添加收藏
         favoriteService.saveCollect(aid, uid);
+
+        Article articleById = articleService.findById(aid);
+
+        XbWebSocket.sendMessage(articleById.getUserId(), LoginUserUtil.getLoginUser().getRealName()+"刚刚收藏了您的文章："+articleById.getTitle());
+
         return new Result(true,"收藏成功");
     }
 

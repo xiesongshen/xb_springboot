@@ -1,5 +1,6 @@
 package com.xss.controller;
 
+import com.xss.config.XbWebSocket;
 import com.xss.entity.Meeting;
 import com.xss.entity.PageResult;
 import com.xss.entity.Result;
@@ -125,6 +126,18 @@ public class MeetingController {
     public Result save(@RequestBody Meeting meeting){
 
         meetingService.save(meeting);
+
+        String[] users = meeting.getMakeUser().split(",");
+
+        /**
+         * 给此次会议所要参加的用户推送信息
+         */
+        for (String userId : users) {
+
+            String message="您接收到一个会议,开始时间为"+LoginUserUtil.dateToStr(meeting.getStartTime())+"记得准时参加哦！";
+
+            XbWebSocket.sendMessage(Long.parseLong(userId),message);
+        }
         return new Result(true,"发布成功");
     }
 }

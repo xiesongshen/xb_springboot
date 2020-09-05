@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,6 +31,12 @@ public class LoginUserUtil {
     private static HttpServletRequest request;
 
     private static UserService userService;
+
+    public static String dateToStr(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return sdf.format(date);
+    }
 
     /**
      * Spring容器会在类加载后自动注入这个方法的参数，并执行一遍方法。

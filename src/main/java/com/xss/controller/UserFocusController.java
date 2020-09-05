@@ -1,5 +1,6 @@
 package com.xss.controller;
 
+import com.xss.config.XbWebSocket;
 import com.xss.entity.Result;
 import com.xss.service.UserFocusService;
 import com.xss.utils.LoginUserUtil;
@@ -8,6 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 /**
  * @author XSS
@@ -20,6 +24,9 @@ public class UserFocusController {
 
     @Autowired
     UserFocusService userFocusService;
+
+    @Autowired
+    HttpSession session;
 
 
     /*
@@ -40,12 +47,21 @@ public class UserFocusController {
         Boolean isFucos = userFocusService.isFocus(userId, focusId);
 
         if (isFucos) {
+            session.setAttribute("time"+focusId,new Date().getTime());
 
             // 已经关注过(取消关注)
             userFocusService.delFocus(userId, focusId);
 
             return new Result(true, "取关成功");
         }
+
+        Long oldTime = (Long) session.getAttribute("time" + focusId);
+
+        if (oldTime == null||new Date().getTime() - oldTime > 1*60*1000){
+
+            XbWebSocket.sendMessage(focusId, LoginUserUtil.getLoginUser().getRealName() + "关注了您");
+        }
+
 
         // 关注
         userFocusService.save(userId, focusId);

@@ -1,5 +1,6 @@
 package com.xss.controller;
 
+import com.xss.config.XbWebSocket;
 import com.xss.entity.PageResult;
 import com.xss.entity.Result;
 import com.xss.entity.User;
@@ -16,10 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -124,6 +122,13 @@ public class UserController {
         // 把userId存入session
         session.setAttribute("userId", dbUser.getId());
 
+        Long loginOutTime = (Long) session.getAttribute("loginOutTime");
+
+        if (loginOutTime == null||new Date().getTime() - loginOutTime > 1*60*1000){
+
+            XbWebSocket.sendMessageNotUser(LoginUserUtil.getLoginUser().getId(), LoginUserUtil.getLoginUser().getRealName() + "上线了！");
+        }
+
         //更改登陆时间
         userService.updateLoginTime(dbUser.getId());
 
@@ -159,6 +164,8 @@ public class UserController {
         List<Integer> ids = userService.findFocus(LoginUserUtil.getLoginUser().getId());
 
         Map returnMap = new HashMap();
+
+
 
         returnMap.put("pageResult", pageResult);
         returnMap.put("userFocus", ids);
@@ -304,6 +311,13 @@ public class UserController {
         redisTemplate.delete("loginUser:"+LoginUserUtil.getLoginUser().getId());
 
         session.invalidate();
+
+        session.setAttribute("loginOutTime",new Date().getTime());
+
+        if (new Date().getTime() - LoginUserUtil.getLoginUser().getLoginTime().getTime() > 1*60*1000){
+
+            XbWebSocket.sendMessageNotUser(LoginUserUtil.getLoginUser().getId(), LoginUserUtil.getLoginUser().getRealName() + "刚刚下线了！");
+        }
 
         return new Result(true,"登出成功");
     }

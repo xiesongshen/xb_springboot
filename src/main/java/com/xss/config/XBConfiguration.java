@@ -81,7 +81,8 @@ public class XBConfiguration extends WebMvcConfigurerAdapter {
                 .excludePathPatterns("/js/**")
                 .excludePathPatterns("/vendor/**")
                 .excludePathPatterns("/assets/**")
-                .excludePathPatterns("/upload/**");
+                .excludePathPatterns("/upload/**")
+                .excludePathPatterns("/xb_socket/**");
     }
 
     /*
