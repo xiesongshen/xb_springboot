@@ -48,7 +48,7 @@ public class HomeController {
             List temp = new ArrayList();
 
             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                Object val = map.get(entry.getKey());
+                Object val = entry.getValue();
                 temp.add(val);
             }
             countList.add(temp);
